@@ -3,18 +3,24 @@ const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 oscillator.connect(audioContext.destination);
 
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
+const reader = new FileReader();
 
 let on = false;
 
-let pressedKey; let index; let frequencies; let notes; let octave;
+let pressedKey; let index; let frequencies; let notes;
+
+reader.onload = function() {
+    console.log(reader.result);
+}
 
 function resetVariables() {
     pressedKey = null; 
     index = 0; 
     frequencies = [];
-    notes = document.getElementById("notes").value;
-    notes = notes.trim().toLowerCase().split(/\s+/);
-    octave = 4;
+    notes = document.getElementById("notes").files[0];
+    if (notes) {
+        reader.readAsArrayBuffer(notes);
+    }
 }
 
 resetVariables();
