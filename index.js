@@ -10,7 +10,28 @@ let on = false;
 let pressedKey; let index; let frequencies; let notes;
 
 reader.onload = function() {
-    console.log(reader.result);
+    let buffer = reader.result; 
+    let view = new Uint8Array(buffer);
+    console.log(view);
+
+    //console.log(view[14]);
+    //console.log(typeof(view[14]));
+    //view.findIndex()
+    let i = 0;
+    let channel = 0;
+
+    while (i < view.length - 1) {
+        view.slice(i,i+1);
+        if (view[i] === (144 + channel) ) {
+            const pitch = view[i+1] - 60;
+            
+            const frequency = 2 ** (pitch/12 + 8);
+            frequencies.push(frequency);
+
+            console.log(i);
+        }
+        i++;
+    }
 }
 
 function resetVariables() {
