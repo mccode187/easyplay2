@@ -7,41 +7,31 @@ const reader = new FileReader();
 
 let on = false;
 
-let pressedKey; let index; let frequencies; let notes;
+let pressedKey; let index; let frequencies; let notes; let channel;
 
 reader.onload = function() {
     let buffer = reader.result; 
     let view = new Uint8Array(buffer);
-    console.log(view);
-
-    //console.log(view[14]);
-    //console.log(typeof(view[14]));
-    //view.findIndex()
-    let i = 0;
-    let channel = 0;
-
-    while (i < view.length - 1) {
-        view.slice(i,i+1);
+    for (let i = 0; i < view.length - 1; i++) {
         if (view[i] === (144 + channel) ) {
             const pitch = view[i+1] - 60;
-            
             const frequency = 2 ** (pitch/12 + 8);
-            frequencies.push(frequency);
-
-            console.log(i);
+            frequencies.push(frequency);    
         }
-        i++;
     }
+    console.log(frequencies);
 }
 
 function resetVariables() {
     pressedKey = null; 
     index = 0; 
     frequencies = [];
+    channel = +document.getElementById("channel").value;
     notes = document.getElementById("notes").files[0];
     if (notes) {
         reader.readAsArrayBuffer(notes);
     }
+
 }
 
 resetVariables();
@@ -76,7 +66,7 @@ function convertNotesToFrequencies() {
             pitch += value[note.pop()];
         }
         const frequency = 2 ** (pitch/12 + octave + 4);
-        frequencies.push(frequency);
+        frequencies[0].push(frequency);
     }
 }
 
