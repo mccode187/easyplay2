@@ -7,26 +7,24 @@ const reader = new FileReader();
 
 let on = false;
 
-let pressedKey; let index; let frequencies; let notes; let channel;
+let pressedKey; let index; let frequencies; let notes; let track;
 
-reader.onload = function() {
-    let buffer = reader.result; 
-    let view = new Uint8Array(buffer);
-    for (let i = 0; i < view.length - 1; i++) {
-        if (view[i] === (144 + channel) ) {
-            const pitch = view[i+1] - 60;
-            const frequency = 2 ** (pitch/12 + 8);
-            frequencies.push(frequency);    
-        }
-    }
-    console.log(frequencies);
+reader.onload = function(e) {
+    const midi = new Midi(e.target.result);
+    let notes = midi.tracks[track].notes;
+    console.log(midi);
+    for (let i = 0; i < notes.length; i++) {
+        const pitch = notes[i].midi - 60;
+        const frequency = 2 ** (pitch/12 + 8);
+        frequencies.push(frequency);    
+    } 
 }
 
 function resetVariables() {
     pressedKey = null; 
     index = 0; 
     frequencies = [];
-    channel = +document.getElementById("channel").value;
+    track = +document.getElementById("track").value;
     notes = document.getElementById("notes").files[0];
     if (notes) {
         reader.readAsArrayBuffer(notes);
@@ -56,7 +54,7 @@ document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
 
 function convertNotesToFrequencies() {
-    for (i = 0; i < notes.length; i++) {
+    for (let i = 0; i < notes.length; i++) {
         const note = notes[i].split('');
         if (+note.at(-1)) { 
             octave = +note.pop(); 
