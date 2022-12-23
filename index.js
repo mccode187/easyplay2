@@ -3,12 +3,12 @@ const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 oscillator.connect(audioContext.destination);
 
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
-const reader = new FileReader();
-
+const badKeys = ["Audio", "Alt", "Launch", "Enter", "Meta", "Play", "Tab"];
 let on = false;
 
-let pressedKey; let index; let frequencies; let notes; let track;
+let pressedKey; let index; let frequencies; let notes; let paused; let track;
 
+const reader = new FileReader();
 reader.onload = function(e) {
     const midi = new Midi(e.target.result);
     let notes = midi.tracks[track].notes;
@@ -29,14 +29,16 @@ function resetVariables() {
     if (notes) {
         reader.readAsArrayBuffer(notes);
     }
+    paused = false;
 
 }
 
 resetVariables();
 
 function down(e) {
-    if (on && !e.key.includes("Audio") && e.key != pressedKey && !e.repeat 
-            && index < frequencies.length) {
+    if (on && !badKeys.some(badKey => e.key.includes(badKey)) && !e.repeat 
+            && (e.key != pressedKey) && (index < frequencies.length) 
+            && !paused) {
         oscillator.frequency.value = frequencies[index];
         index++;
         pressedKey = e.key;
@@ -44,7 +46,7 @@ function down(e) {
 }
 
 function up(e) {
-    if (on && (e.key === pressedKey)) {
+    if (on && (e.key === pressedKey) && !paused) {
         oscillator.frequency.value = 0;
         pressedKey = null;
     }
@@ -52,21 +54,6 @@ function up(e) {
 
 document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
-
-function convertNotesToFrequencies() {
-    for (let i = 0; i < notes.length; i++) {
-        const note = notes[i].split('');
-        if (+note.at(-1)) { 
-            octave = +note.pop(); 
-        }
-        let pitch = 0;
-        while (note.length) {
-            pitch += value[note.pop()];
-        }
-        const frequency = 2 ** (pitch/12 + octave + 4);
-        frequencies[0].push(frequency);
-    }
-}
 
 function startOscillatorIfNeccessary() {
     if (!on) { 
@@ -77,8 +64,18 @@ function startOscillatorIfNeccessary() {
 
 function start() {
     resetVariables();
-    convertNotesToFrequencies();
     startOscillatorIfNeccessary();
 }
 
+function pause() {
+    paused = true;
+    oscillator.frequency.value = 0;
+}
+
+function resume() {
+    paused = false;
+}
+
 document.getElementById("start").addEventListener("click", start);
+document.getElementById("pause").addEventListener("click", pause);
+document.getElementById("resume").addEventListener("click", resume);
