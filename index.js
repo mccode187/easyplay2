@@ -4,16 +4,19 @@ const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
+let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
 let frequencies = []; let index; let midi; let notes; let on = false;
 let paused; let pressedKey; let track; 
 
-oscillator.connect(audioContext.destination); resetVariables();
+oscillator.connect(audioContext.destination);
+resetVariables();
 
 function convertNotesToFrequencies() {
     let notes = midi.tracks[track].notes;
     for (let i = 0; i < notes.length; i++) {
         const pitch = notes[i].midi - 60;
-        const frequency = 2 ** (pitch/12 + 8);
+        let frequency = tuningFrequency;
+        frequency *= 2**((pitch - tuningPitch)/12 + 4 - tuningOctave);
         frequencies.push(frequency);    
     }
 }
@@ -29,8 +32,25 @@ function down(e) {
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
-function resetVariables() {pressedKey = null; index = 0; paused = false;
-    frequencies = []; track = +document.getElementById("track").value;}
+function resetVariables() {
+    pressedKey = null; 
+    index = 0; 
+    frequencies = [];
+    tuningNote = document.getElementById("tuningNote").value;
+    tuningNote = tuningNote.trim().toLowerCase().split('');
+    if (+tuningNote.at(-1)) { 
+        tuningOctave = +tuningNote.pop(); 
+    } else {
+        tuningOctave = 4;
+    }
+    tuningPitch = 0;
+    while (tuningNote.length) {
+        tuningPitch += value[tuningNote.pop()];
+    }
+    tuningFrequency = +document.getElementById("tuningFrequency").value;
+    track = +document.getElementById("track").value;
+    paused = false;
+}
 
 function resume() { paused = false; }
 
