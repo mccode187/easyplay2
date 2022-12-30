@@ -30,7 +30,7 @@ function down(e) {
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
 function resetVariables() {pressedKey = null; index = 0; paused = false;
-    track = +document.getElementById("track").value;}
+    frequencies = []; track = +document.getElementById("track").value;}
 
 function resume() { paused = false; }
 
@@ -59,10 +59,10 @@ reader.onload = function(e) {
 }
 
 document.getElementById("notes").addEventListener("change", () => {
+    resetVariables();
     notes = document.getElementById("notes").files[0];
     if (notes) {reader.readAsArrayBuffer(notes);}
 });
-
 document.getElementById("start").addEventListener("click", start);
 document.getElementById("pause").addEventListener("click", pause);
 document.getElementById("resume").addEventListener("click", resume);
