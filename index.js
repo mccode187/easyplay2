@@ -24,7 +24,7 @@ function convertNotesToFrequencies() {
 function down(e) {
     if (on && !badKeys.some(badKey => e.key.includes(badKey)) && !e.repeat 
             && (e.key != pressedKey) && (index < frequencies.length) 
-            && !paused) {
+            && !paused && (document.activeElement.nodeName !== 'INPUT')) {
         oscillator.frequency.value = frequencies[index];
         index++; pressedKey = e.key;
     }
@@ -62,7 +62,7 @@ function startOscillatorIfNeccessary() {
 }
 
 function up(e) {
-    if (on && (e.key === pressedKey) && !paused) {
+    if (on && (e.key === pressedKey)) {
         oscillator.frequency.value = 0; pressedKey = null;
     }
 }
