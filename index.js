@@ -1,5 +1,6 @@
 const audioContext = new AudioContext();
 const badKeys = ["Audio", "Alt", "Launch", "Enter", "Meta", "Play", "Tab"];
+const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
@@ -8,7 +9,7 @@ let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
 let frequencies = []; let index; let midi; let notes; let on = false;
 let paused; let pressedKey; let track; 
 
-oscillator.connect(audioContext.destination);
+oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
 
 function convertNotesToFrequencies() {
@@ -34,7 +35,7 @@ function pause() { paused = true; oscillator.frequency.value = 0; }
 
 function resetVariables() {
     pressedKey = null; 
-    index = 0; 
+    index = 0;
     frequencies = [];
     tuningNote = document.getElementById("tuningNote").value;
     tuningNote = tuningNote.trim().toLowerCase().split('');
@@ -49,6 +50,12 @@ function resetVariables() {
     }
     tuningFrequency = +document.getElementById("tuningFrequency").value;
     track = +document.getElementById("track").value;
+    const proposedGain = +document.getElementById("gain").value;
+    if (proposedGain <= 1 && proposedGain >= 0) {
+        gainNode.gain.value = +document.getElementById("gain").value;
+    } else {
+        gainNode.gain.value = 1;
+    }
     paused = false;
 }
 
