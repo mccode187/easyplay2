@@ -6,14 +6,14 @@ const reader = new FileReader();
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
-let frequencies = []; let index; let midi; let notes; let on = false;
+let frequencies = []; let index; let midi; let on = false;
 let paused; let pressedKey; let track; 
 
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
 
 function convertNotesToFrequencies() {
-    let notes = midi.tracks[track].notes;
+    const notes = midi.tracks[track].notes;
     for (let i = 0; i < notes.length; i++) {
         const pitch = notes[i].midi - 60;
         let frequency = tuningFrequency;
@@ -85,10 +85,11 @@ reader.onload = function(e) {
     console.log(midi);
 }
 
-document.getElementById("notes").addEventListener("change", () => {
+const fileInput = document.getElementById("fileInput");
+fileInput.addEventListener("change", () => {
     resetVariables();
-    notes = document.getElementById("notes").files[0];
-    if (notes) {reader.readAsArrayBuffer(notes);}
+    const file = fileInput.files[0];
+    if (file) {reader.readAsArrayBuffer(file);}
 });
 document.getElementById("start").addEventListener("click", start);
 document.getElementById("pause").addEventListener("click", pause);
