@@ -54,7 +54,7 @@ function resetVariables() {
     if (proposedGain <= 1 && proposedGain >= 0) {
         gainNode.gain.value = +document.getElementById("gain").value;
     } else {
-        gainNode.gain.value = 1;
+        gainNode.gain.value = 0.5;
     }
     paused = false;
 }
