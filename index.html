@@ -6,13 +6,14 @@
 <input id="tuningFrequency" placeholder="tuningFrequency" value="440">
 <p>Gain:
 <input id="gain" placeholder="0 <= gain <= 1" value="0.5">
-<p>Notes:
+<p>File:
 <input id="fileInput" type="file" accept=".mid,.midi">
-<input id="track">
+<p>Track:
+<select id="track"></select>
+<p>Controls:
 <button id="start">start</button>
 <button id="pause">pause</button>
 <button id="resume">resume</button>
-<p id="viewTracks"></p>
 <h2>Instructions</h2>
 <ol>
 <li>Upload a MIDI file and select a track.

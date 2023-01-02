@@ -49,7 +49,7 @@ function resetVariables() {
         tuningPitch += value[tuningNote.pop()];
     }
     tuningFrequency = +document.getElementById("tuningFrequency").value;
-    track = +document.getElementById("track").value;
+    track = document.getElementById("track").selectedIndex;
     const proposedGain = +document.getElementById("gain").value;
     if (proposedGain <= 1 && proposedGain >= 0) {
         gainNode.gain.value = +document.getElementById("gain").value;
@@ -76,11 +76,13 @@ function up(e) {
 
 reader.onload = function(e) {
     midi = new Midi(e.target.result);
-    document.getElementById("viewTracks").innerHTML = "Tracks:";
+    const select = document.getElementById("track");
+    for (a in select.options) { select.options.remove(0); }
     for (let i = 0; i < midi.tracks.length; i++) {
         let t = midi.tracks[i];
-        document.getElementById("viewTracks").innerHTML += "<br>" + i + ": " 
-            + t.name;
+        const option = document.createElement("option");
+        option.text = t.name;
+        select.add(option);
     }
     console.log(midi);
 }
