@@ -7,7 +7,7 @@ const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
 let frequencies = []; let index; let midi; let on = false;
-let paused; let pressedKey; let track; 
+let paused; let pressedKey; let track; let normalGain;
 
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
@@ -26,7 +26,9 @@ function down(e) {
     if (on && !badKeys.some(badKey => e.key.includes(badKey)) && !e.repeat 
             && (e.key != pressedKey) && (index < frequencies.length) 
             && !paused && (document.activeElement.nodeName !== 'INPUT')) {
-        oscillator.frequency.value = frequencies[index];
+        oscillator.frequency.value = frequencies[index]; // switch order?
+        gainNode.gain.setTargetAtTime(normalGain, audioContext.currentTime, 0.015);
+        //gainNode.gain.value = normalGain;
         index++; pressedKey = e.key;
     }
 }
@@ -52,10 +54,11 @@ function resetVariables() {
     track = document.getElementById("track").selectedIndex;
     const proposedGain = +document.getElementById("gain").value;
     if (proposedGain <= 1 && proposedGain >= 0) {
-        gainNode.gain.value = +document.getElementById("gain").value;
+        normalGain = +document.getElementById("gain").value;
     } else {
-        gainNode.gain.value = 0.5;
+        normalGain = 0.15;
     }
+    gainNode.gain.value = 0;
     paused = false;
 }
 
@@ -70,7 +73,9 @@ function startOscillatorIfNeccessary() {
 
 function up(e) {
     if (on && (e.key === pressedKey)) {
-        oscillator.frequency.value = 0; pressedKey = null;
+        gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
+        //oscillator.frequency.value = 0; 
+        pressedKey = null;
     }
 }
 
