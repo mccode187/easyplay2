@@ -2,16 +2,12 @@
 <title>EasyPlay2</title>
 <h1>EasyPlay2</h1>
 <p>tuning:
-<input id="tuningNote" placeholder="tuningNote" value="a4"> =
-<input id="tuningFrequency" placeholder="tuningFrequency" value="440">
-<p>gain:
-<input id="gain" placeholder="0 <= gain <= 1" value="0.15">
-<p>input:
-<p><input type="radio" id="text" name="inputMethod">
-    <label for="text">notes:</label>
-    <input id="notes" placeholder="notes">
-<p><input type="radio" id="file" name="inputMethod">
-    <label for="file">file:</label>
+<input id="tuningNote" placeholder="tuningNote" value="a4" size="2"> =
+<input id="tuningFrequency" placeholder="tuningFrequency" value="440" size="7">
+gain: <input id="gain" placeholder="0 <= gain <= 1" value="0.15">
+<p><input type="radio" id="notesRadio" name="inputMethod" checked>notes:
+    <input id="notes" placeholder="notes" value="c c g g a a g f f e e d d c">
+<p><input type="radio" id="fileRadio" name="inputMethod">file:
     <input id="fileInput" type="file" accept=".mid,.midi">
     track: <select id="track"></select>
 <p>controls:
@@ -20,9 +16,8 @@
 <button id="resume">resume</button>
 <h2>Instructions</h2>
 <ol>
-<li>Select "text" and type (or copy-paste) whitespace-separated notes into the 
-    box labelled "notes". Alternatively, select "file", upload a MIDI file, and 
-    select a track.
+<li>Select "notes" and type (or copy-paste) whitespace-separated notes into the 
+    box. Alternatively, select "file", upload a MIDI file, and select a track.
 <li>Click start.
 <li>Press keys to play notes!
 </ol>

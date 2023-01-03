@@ -6,19 +6,36 @@ const reader = new FileReader();
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
-let frequencies = []; let index; let midi; let on = false;
-let paused; let pressedKey; let touchedFinger; let track; let normalGain;
+let frequencies = []; let index; let midi; let normalGain; let notes; 
+let octave; let on = false; let paused; let pressedKey; let touchedFinger; 
+let track; 
 
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
 
 function convertNotesToFrequencies() {
-    const notes = midi.tracks[track].notes;
-    for (let i = 0; i < notes.length; i++) {
-        const pitch = notes[i].midi - 60;
-        let frequency = tuningFrequency;
-        frequency *= 2**((pitch - tuningPitch)/12 + 4 - tuningOctave);
-        frequencies.push(frequency);
+    if (document.getElementById("fileRadio").checked) {
+        const notes = midi.tracks[track].notes;
+        for (let i = 0; i < notes.length; i++) {
+            const pitch = notes[i].midi - 60;
+            let frequency = tuningFrequency;
+            frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
+            frequencies.push(frequency);
+        }    
+    } else {
+        for (i = 0; i < notes.length; i++) {
+            const note = notes[i].split('');
+            if (+note.at(-1)) { 
+                octave = +note.pop(); 
+            }
+            let pitch = 0;
+            while (note.length) {
+                pitch += value[note.pop()];
+            }
+            let frequency = tuningFrequency;
+            frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
+            frequencies.push(frequency);
+        }
     }
 }
 
@@ -67,6 +84,9 @@ function resetVariables() {
         tuningPitch += value[tuningNote.pop()];
     }
     tuningFrequency = +document.getElementById("tuningFrequency").value;
+    notes = document.getElementById("notes").value;
+    notes = notes.trim().toLowerCase().split(/\s+/);
+    octave = 4;
     track = document.getElementById("track").selectedIndex;
     const proposedGain = +document.getElementById("gain").value;
     if (proposedGain <= 1 && proposedGain >= 0) {
