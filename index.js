@@ -7,7 +7,7 @@ const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
 let frequencies = []; let index; let midi; let on = false;
-let paused; let pressedKey; let track; let normalGain;
+let paused; let pressedKey; let touchedFinger; let track; let normalGain;
 
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
@@ -40,6 +40,18 @@ function down(e) {
 }
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
+
+function release(e) {
+    const touches = e.changedTouches;
+    // console.log(touches.length);
+    for (let i = 0; i < touches.length; i++) {
+        console.log("up",touches.item(i).identifier);
+        if (on && touches.item(i).identifier === touchedFinger) {
+            oscillator.frequency.value = 0;
+            touchedFinger = null;
+        }
+    }
+}
 
 function resetVariables() {
     pressedKey = null; 
@@ -80,6 +92,21 @@ function startOscillatorIfNeccessary() {
     }
 }
 
+function touch(e) {
+    console.log(e.target);
+    const touches = e.changedTouches;
+    // console.log(touches.length);
+    for (let i = 0; i < touches.length; i++) {
+        console.log("down",touches.item(i).identifier);
+        if (on // && !(touches.item(i).identifier === touchedFinger)
+            && !e.repeat && index < frequencies.length) {
+                oscillator.frequency.value = frequencies[index];
+                index++;
+                touchedFinger = e.changedTouches.item(i).identifier;
+        }
+    }
+}
+
 function up(e) {
     if (on && (e.key === pressedKey)) {
         gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
@@ -111,3 +138,5 @@ document.getElementById("pause").addEventListener("click", pause);
 document.getElementById("resume").addEventListener("click", resume);
 document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
+document.addEventListener("touchstart", touch);
+//document.addEventListener("touchend", release);
