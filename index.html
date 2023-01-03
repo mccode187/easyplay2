@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <title>EasyPlay</title>
+<style>html * {font-family: monospace,monospace;}</style>
 <h1>EasyPlay</h1>
 <p>tuning:
-<input id="tuningNote" placeholder="tuningNote" value="a4" size="2"> =
-<input id="tuningFrequency" placeholder="tuningFrequency" value="440" size="7">
-gain: <input id="gain" placeholder="0 <= gain <= 1" value="0.15">
+<input id="tuningNote" value="a4" size="1"> =
+<input id="tuningFrequency" value="440" size="2">
+<p>gain:
+<input id="gain" value="0.15" size="3">
 <p><input type="radio" id="notesRadio" name="inputMethod" checked>notes:
-    <input id="notes" placeholder="notes" value="c c g g a a g f f e e d d c">
+    <input id="notes" value="f3 f c4 c d d c b&3 b& a a g f## f" size="34">
 <p><input type="radio" id="fileRadio" name="inputMethod">file:
     <input id="fileInput" type="file" accept=".mid,.midi">
     track: <select id="track"></select>
@@ -14,35 +16,6 @@ gain: <input id="gain" placeholder="0 <= gain <= 1" value="0.15">
 <button id="start">start</button>
 <button id="pause">pause</button>
 <button id="resume">resume</button>
-<h2>Instructions</h2>
-<ol>
-<li>Select "notes" and type (or copy-paste) whitespace-separated notes into the 
-    box. Alternatively, select "file", upload a MIDI file, and select a track.
-<li>Click start.
-<li>Press keys to play notes!
-</ol>
-<h2>Details</h2>
-<p>Each note consists of a pitch (required), 
-    an accidental (optional), and an octave (optional).
-<ul>
-<li>Pitches: c d e f g a b
-<li>Accidentals: # & ## && (default is natural / no accidental)
-<li>Octaves: 1 2 3 4 5 6 7 8 (default is the most recent octave, 
-    or 4, at the beginning of the piece)
-</ul>
-<p>Example notes: c b3 b& c#4 a## g&&5
-<p>Links: 
-<a href="https://www.youtube.com/watch?v=3UUZxs8AU_Q">demo</a>
-<a href = http://bit.ly/3WeiGg0>mozart</a>
-<a href="https://www.youtube.com/watch?v=Foo_qNPZAkM">demo</a>
-<a href = "https://bit.ly/3GahlBD">bach</a>
-<p>See also:
-<a href="https://mcchu.com/easyplay3">easyplay3</a>
-<h2>Afterwards</h2>
-<p>Thanks for playing! I hope you enjoyed it!
-<p>--- <a href = "mailto:michael02chu@gmail.com">contact</a>
-    <a href = "https://github.com/michaelcchu/easyplay">source</a>
-    <a href = "https://mcchu.com">home</a> ---
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>eruda.init();</script>
 <script src="https://unpkg.com/@tonejs/midi"></script>
