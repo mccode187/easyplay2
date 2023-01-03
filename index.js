@@ -90,7 +90,7 @@ function up(e) {
 reader.onload = function(e) {
     midi = new Midi(e.target.result);
     const select = document.getElementById("track");
-    for (a in select.options) { select.options.remove(0); }
+    while (select.options.length) { select.options.remove(0); }
     for (let i = 0; i < midi.tracks.length; i++) {
         let t = midi.tracks[i];
         const option = document.createElement("option");
