@@ -45,7 +45,7 @@ function release(e) {
     const touches = e.changedTouches;
     // console.log(touches.length);
     for (let i = 0; i < touches.length; i++) {
-        console.log("up",touches.item(i).identifier);
+        //console.log("up",touches.item(i).identifier);
         if (on && touches.item(i).identifier === touchedFinger) {
             gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
             //oscillator.frequency.value = 0;
@@ -99,10 +99,11 @@ function touch(e) {
     const touches = e.changedTouches;
     // console.log(touches.length);
     for (let i = 0; i < touches.length; i++) {
-        console.log("down",touches.item(i).identifier);
+        //console.log("down",touches.item(i).identifier);
         if (on // && !(touches.item(i).identifier === touchedFinger)
-            && !e.repeat && index < frequencies.length) {
+             && index < frequencies.length) {
                 if (touchedFinger === null) {
+                    console.log("null");
                     oscillator.frequency.value = frequencies[index];
                     gainNode.gain.setTargetAtTime(normalGain, 
                         audioContext.currentTime, 0.015);
@@ -150,4 +151,4 @@ document.getElementById("resume").addEventListener("click", resume);
 document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
 document.addEventListener("touchstart", touch);
-//document.addEventListener("touchend", release);
+document.addEventListener("touchend", release);
