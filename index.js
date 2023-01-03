@@ -47,7 +47,8 @@ function release(e) {
     for (let i = 0; i < touches.length; i++) {
         console.log("up",touches.item(i).identifier);
         if (on && touches.item(i).identifier === touchedFinger) {
-            oscillator.frequency.value = 0;
+            gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
+            //oscillator.frequency.value = 0;
             touchedFinger = null;
         }
     }
@@ -93,14 +94,23 @@ function startOscillatorIfNeccessary() {
 }
 
 function touch(e) {
-    console.log(e.target);
+    //console.log(e.target);
     const touches = e.changedTouches;
     // console.log(touches.length);
     for (let i = 0; i < touches.length; i++) {
         console.log("down",touches.item(i).identifier);
         if (on // && !(touches.item(i).identifier === touchedFinger)
             && !e.repeat && index < frequencies.length) {
-                oscillator.frequency.value = frequencies[index];
+                if (touchedFinger === null) {
+                    oscillator.frequency.value = frequencies[index];
+                    gainNode.gain.setTargetAtTime(normalGain, 
+                        audioContext.currentTime, 0.015);
+                } else {
+                    oscillator.frequency.setTargetAtTime(frequencies[index], 
+                        audioContext.currentTime, 0.003)    
+                }
+                console.log(frequencies[index]);
+                //oscillator.frequency.value = frequencies[index];
                 index++;
                 touchedFinger = e.changedTouches.item(i).identifier;
         }
