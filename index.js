@@ -78,6 +78,7 @@ function resetVariables() {
         normalGain = 0.15;
     }
     gainNode.gain.value = 0;
+    touchedFinger = null;
     paused = false;
 }
 
