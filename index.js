@@ -70,6 +70,7 @@ function release(e) {
 
 function resetVariables() {
     pressedKey = null; 
+    touchedFinger = null;
     index = 0;
     frequencies = [];
     tuningNote = document.getElementById("tuningNote").value;
@@ -95,7 +96,6 @@ function resetVariables() {
         normalGain = 0.15;
     }
     gainNode.gain.value = 0;
-    touchedFinger = null;
     paused = false;
 }
 
