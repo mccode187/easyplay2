@@ -97,7 +97,6 @@ function touch(e) {
         if (on && !(touches.item(i).identifier === touchedFinger)
              && index < frequencies.length) {
                 if (touchedFinger === null) {
-                    console.log("null");
                     oscillator.frequency.value = frequencies[index];
                     gainNode.gain.setTargetAtTime(normalGain, 
                         audioContext.currentTime, 0.015);
@@ -105,7 +104,6 @@ function touch(e) {
                     oscillator.frequency.setTargetAtTime(frequencies[index], 
                         audioContext.currentTime, 0.003)    
                 }
-                console.log(frequencies[index]);
                 index++;
                 touchedFinger = e.changedTouches.item(i).identifier;
         }
