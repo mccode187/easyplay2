@@ -1,27 +1,44 @@
 <!DOCTYPE html>
 <title>EasyPlay2</title>
 <h1>EasyPlay2</h1>
-<p>Tuning:
-<input id="tuningNote" placeholder="tuningNote" value="a4">
+<p>tuning:
+<input id="tuningNote" placeholder="tuningNote" value="a4"> =
 <input id="tuningFrequency" placeholder="tuningFrequency" value="440">
-<p>Gain:
+<p>gain:
 <input id="gain" placeholder="0 <= gain <= 1" value="0.15">
-<p>File:
-<input id="fileInput" type="file" accept=".mid,.midi">
-<p>Track:
-<select id="track"></select>
-<p>Controls:
+<p>input:
+<p><input type="radio" id="text" name="inputMethod">
+    <label for="text">notes:</label>
+    <input id="notes" placeholder="notes">
+<p><input type="radio" id="file" name="inputMethod">
+    <label for="file">file:</label>
+    <input id="fileInput" type="file" accept=".mid,.midi">
+    track: <select id="track"></select>
+<p>controls:
 <button id="start">start</button>
 <button id="pause">pause</button>
 <button id="resume">resume</button>
 <h2>Instructions</h2>
 <ol>
-<li>Upload a MIDI file and select a track.
+<li>Select "text" and type (or copy-paste) whitespace-separated notes into the 
+    box labelled "notes". Alternatively, select "file", upload a MIDI file, and 
+    select a track.
 <li>Click start.
 <li>Press keys to play notes!
 </ol>
 <h2>Details</h2>
+<p>Each note consists of a pitch (required), 
+    an accidental (optional), and an octave (optional).
+<ul>
+<li>Pitches: c d e f g a b
+<li>Accidentals: # & ## && (default is natural / no accidental)
+<li>Octaves: 1 2 3 4 5 6 7 8 (default is the most recent octave, 
+    or 4, at the beginning of the piece)
+</ul>
+<p>Example notes: c b3 b& c#4 a## g&&5
 <p>Links: 
+<a href="https://www.youtube.com/watch?v=3UUZxs8AU_Q">demo</a>
+<a href = http://bit.ly/3WeiGg0>mozart</a>
 <a href="https://www.youtube.com/watch?v=Foo_qNPZAkM">demo</a>
 <a href = "https://bit.ly/3GahlBD">bach</a>
 <p>See also:
