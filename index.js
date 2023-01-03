@@ -18,7 +18,7 @@ function convertNotesToFrequencies() {
         const pitch = notes[i].midi - 60;
         let frequency = tuningFrequency;
         frequency *= 2**((pitch - tuningPitch)/12 + 4 - tuningOctave);
-        frequencies.push(frequency);    
+        frequencies.push(frequency);
     }
 }
 
@@ -26,10 +26,16 @@ function down(e) {
     if (on && !badKeys.some(badKey => e.key.includes(badKey)) && !e.repeat 
             && (e.key != pressedKey) && (index < frequencies.length) 
             && !paused && (document.activeElement.nodeName !== 'INPUT')) {
-        oscillator.frequency.value = frequencies[index]; // switch order?
-        gainNode.gain.setTargetAtTime(normalGain, audioContext.currentTime, 0.015);
-        //gainNode.gain.value = normalGain;
-        index++; pressedKey = e.key;
+        if (pressedKey === null) {
+            oscillator.frequency.value = frequencies[index];
+            gainNode.gain.setTargetAtTime(normalGain, 
+                audioContext.currentTime, 0.015);
+        } else {
+            oscillator.frequency.setTargetAtTime(frequencies[index], 
+                audioContext.currentTime, 0.003)    
+        }
+        pressedKey = e.key;
+        index++; 
     }
 }
 
@@ -68,13 +74,15 @@ function start() { resetVariables(); convertNotesToFrequencies();
     startOscillatorIfNeccessary(); }
 
 function startOscillatorIfNeccessary() {
-    if (!on) { oscillator.start(); on = true; }
+    if (!on) { 
+        oscillator.start();
+        on = true;
+    }
 }
 
 function up(e) {
     if (on && (e.key === pressedKey)) {
         gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
-        //oscillator.frequency.value = 0; 
         pressedKey = null;
     }
 }
