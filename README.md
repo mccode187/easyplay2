@@ -1,1 +1,1 @@
-# [mcchu.com/easyplay2](https://mcchu.com/easyplay2/)
+# [mcchu.com/easyplay](https://mcchu.com/easyplay/)
