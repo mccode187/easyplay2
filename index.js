@@ -19,6 +19,7 @@ function backwards() {
 }
 
 function convertNotesToFrequencies() {
+    const display = document.getElementById("display");
     if (document.getElementById("fileRadio").checked) {
         const notes = midi.tracks[track].notes;
         for (let i = 0; i < notes.length; i++) {
@@ -26,7 +27,11 @@ function convertNotesToFrequencies() {
             let frequency = tuningFrequency;
             frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
             frequencies.push(frequency);
-        }    
+            const indent = notes[i].midi - 32;
+            const cols = +display.cols;
+            const line = " ".repeat(indent) + "." + " ".repeat(cols-indent-2);
+            display.value += line + "\n";
+        }
     } else {
         for (i = 0; i < notes.length; i++) {
             const note = notes[i].split('');
@@ -40,8 +45,14 @@ function convertNotesToFrequencies() {
             let frequency = tuningFrequency;
             frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
             frequencies.push(frequency);
+            const indent = pitch + octave*12 - 19;
+            const cols = +display.cols;
+            const line = " ".repeat(indent) + "." + " ".repeat(cols-indent-2);
+            display.value += line + "\n";
+
         }
     }
+    display.scrollTop = 0;
 }
 
 function down(e) {
@@ -56,6 +67,19 @@ function down(e) {
             oscillator.frequency.setTargetAtTime(frequencies[index], 
                 audioContext.currentTime, 0.003)    
         }
+        const display = document.getElementById("display");
+        const start = index * display.cols;
+        const end = (index + 1) * display.cols;
+        const position = display.rows * display.cols / 2;
+
+        display.focus();
+        const fullText = display.value;
+        display.value = fullText.substring(0, end + position);
+        display.scrollTop = display.scrollHeight;
+        display.value = fullText;
+
+        display.setSelectionRange(start, end);
+
         pressedKey = e.key;
         index++; 
     }
@@ -106,6 +130,7 @@ function resetVariables() {
         normalGain = 0.15;
     }
     gainNode.gain.value = 0;
+    document.getElementById("display").value = "";
     paused = false;
 }
 
