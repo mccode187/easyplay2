@@ -63,15 +63,7 @@ function convertNotesToFrequencies() {
     display.scrollLeft = display.clientWidth / 2;
 }
 
-function adjustDisplay() {
-    if (pressedKey) {
-        start = (index * 2 + 1) * 129;
-        end = (index * 2 + 2) * 129;
-    } else {
-        start = (index * 2) * 129;
-        end = (index * 2 + 1) * 129;
-    }
-
+function helper(start, end) {
     display.blur();
     display.selectionStart = display.selectionEnd = start;
     display.blur();
@@ -79,6 +71,18 @@ function adjustDisplay() {
     display.selectionStart = start;
     display.selectionEnd = end;
     display.scrollLeft = display.clientWidth / 2;
+}
+
+function adjustDisplay() {
+    let start = (index * 2) * 129;
+    let end = (index * 2 + 1) * 129;
+    helper(start, end);
+
+    if (pressedKey) {
+        start += 129
+        end += 129
+        helper(start, end);
+    }
 }
 
 function down(e) {
