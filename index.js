@@ -1,5 +1,6 @@
 const audioContext = new AudioContext();
-const badKeys = ["Audio", "Alt", "Launch", "Enter", "Meta", "Play", "Tab"];
+const badKeys = ["Alt","Arrow","Audio","Enter","Launch","Meta","Play","Tab"];
+const display = document.getElementById("display");
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
@@ -15,11 +16,11 @@ resetVariables();
 
 function backwards() { 
     index -= +document.getElementById("distance").value;
-    if (index < 0) { index = 0; } 
+    if (index < 0) { index = 0; }
+    adjustDisplay();
 }
 
 function convertNotesToFrequencies() {
-    const display = document.getElementById("display");
     if (document.getElementById("fileRadio").checked) {
         const notes = midi.tracks[track].notes;
         for (let i = 0; i < notes.length; i++) {
@@ -30,6 +31,8 @@ function convertNotesToFrequencies() {
             const indent = notes[i].midi;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
             display.value += line + "\n";
+            const line2 = " ".repeat(128);
+            display.value += line2 + "\n";
         }
     } else {
         for (i = 0; i < notes.length; i++) {
@@ -47,20 +50,27 @@ function convertNotesToFrequencies() {
             const indent = pitch + (octave + 1) * 12;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
             display.value += line + "\n";
+            const line2 = " ".repeat(128);
+            display.value += line2 + "\n";
         }
     }
+    display.focus();
     display.scrollTop = 0;
     display.scrollLeft = display.clientWidth / 2;
 }
 
 function adjustDisplay() {
-    const display = document.getElementById("display");
+    let start; let end;
+    if (pressedKey) {
+        start = (index * 2) * 129;
+        end = (index * 2 + 1) * 129;
+    } else {
+        start = (index * 2 - 1) * 129;
+        end = (index * 2) * 129;
+    }
 
-    const start = index * 129;
-    const end = (index + 1) * 129;
-    const position = display.rows * 129 / 2;
-
-    display.selectionStart = display.selectionEnd = start + position;
+    display.blur();
+    display.selectionStart = display.selectionEnd = start;
     display.blur();
     display.focus();
     display.selectionStart = start;
@@ -80,15 +90,30 @@ function down(e) {
             oscillator.frequency.setTargetAtTime(frequencies[index], 
                 audioContext.currentTime, 0.003)    
         }
-        adjustDisplay();
         pressedKey = e.key;
+        adjustDisplay();
         index++; 
+    } else if (e.key.includes("Arrow")) {
+        if (e.key.includes("Up")) {
+            index--;
+            adjustDisplay();
+        } else if (e.key.includes("Down")) {
+            index++;
+            adjustDisplay();
+        }
     }
 }
 
+display.addEventListener("keydown", function(e) {
+    if (["Space","ArrowUp","ArrowDown"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
 function forwards() { 
     index += +document.getElementById("distance").value;
-    if (index >= frequencies.length) { index = frequencies.length; } 
+    if (index >= frequencies.length) { index = frequencies.length; }
+    adjustDisplay();
 }
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
@@ -131,7 +156,7 @@ function resetVariables() {
         normalGain = 0.15;
     }
     gainNode.gain.value = 0;
-    document.getElementById("display").value = "";
+    display.value = "";
     paused = false;
 }
 
@@ -170,6 +195,7 @@ function up(e) {
     if (on && (e.key === pressedKey)) {
         gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
         pressedKey = null;
+        adjustDisplay();
     }
 }
 
