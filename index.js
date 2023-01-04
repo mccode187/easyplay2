@@ -58,6 +58,8 @@ function down(e) {
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
+function previous() { if (index > 0) { index--; } }
+
 function release(e) {
     const touches = e.changedTouches;
     for (let i = 0; i < touches.length; i++) {
@@ -159,6 +161,7 @@ fileInput.addEventListener("change", () => {
 document.getElementById("start").addEventListener("click", start);
 document.getElementById("pause").addEventListener("click", pause);
 document.getElementById("resume").addEventListener("click", resume);
+document.getElementById("previous").addEventListener("click", previous);
 document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
 document.addEventListener("touchstart", touch);
