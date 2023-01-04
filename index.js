@@ -50,18 +50,22 @@ function convertNotesToFrequencies() {
         }
     }
     display.scrollTop = 0;
+    display.scrollLeft = display.clientWidth / 2;
 }
 
 function adjustDisplay() {
+    const display = document.getElementById("display");
+
     const start = index * 129;
     const end = (index + 1) * 129;
+    const position = display.rows * 129 / 2;
 
-    const display = document.getElementById("display");
-    display.selectionStart = display.selectionEnd = start;
+    display.selectionStart = display.selectionEnd = start + position;
     display.blur();
     display.focus();
     display.selectionStart = start;
     display.selectionEnd = end;
+    display.scrollLeft = display.clientWidth / 2;
 }
 
 function down(e) {
@@ -77,7 +81,6 @@ function down(e) {
                 audioContext.currentTime, 0.003)    
         }
         adjustDisplay();
-
         pressedKey = e.key;
         index++; 
     }
