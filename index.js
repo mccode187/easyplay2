@@ -27,9 +27,8 @@ function convertNotesToFrequencies() {
             let frequency = tuningFrequency;
             frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
             frequencies.push(frequency);
-            const indent = notes[i].midi - 32;
-            const cols = +display.cols;
-            const line = " ".repeat(indent) + "." + " ".repeat(cols-indent-2);
+            const indent = notes[i].midi;
+            const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
             display.value += line + "\n";
         }
     } else {
@@ -45,14 +44,24 @@ function convertNotesToFrequencies() {
             let frequency = tuningFrequency;
             frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
             frequencies.push(frequency);
-            const indent = pitch + octave*12 - 19;
-            const cols = +display.cols;
-            const line = " ".repeat(indent) + "." + " ".repeat(cols-indent-2);
+            const indent = pitch + (octave + 1) * 12;
+            const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
             display.value += line + "\n";
-
         }
     }
     display.scrollTop = 0;
+}
+
+function adjustDisplay() {
+    const start = index * 129;
+    const end = (index + 1) * 129;
+
+    const display = document.getElementById("display");
+    display.selectionStart = display.selectionEnd = start;
+    display.blur();
+    display.focus();
+    display.selectionStart = start;
+    display.selectionEnd = end;
 }
 
 function down(e) {
@@ -67,18 +76,7 @@ function down(e) {
             oscillator.frequency.setTargetAtTime(frequencies[index], 
                 audioContext.currentTime, 0.003)    
         }
-        const display = document.getElementById("display");
-        const start = index * display.cols;
-        const end = (index + 1) * display.cols;
-        const position = display.rows * display.cols / 2;
-
-        display.focus();
-        const fullText = display.value;
-        display.value = fullText.substring(0, end + position);
-        display.scrollTop = display.scrollHeight;
-        display.value = fullText;
-
-        display.setSelectionRange(start, end);
+        adjustDisplay();
 
         pressedKey = e.key;
         index++; 
