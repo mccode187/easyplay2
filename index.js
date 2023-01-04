@@ -13,6 +13,11 @@ let track;
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
 
+function backwards() { 
+    index -= +document.getElementById("distance").value;
+    if (index < 0) { index = 0; } 
+}
+
 function convertNotesToFrequencies() {
     if (document.getElementById("fileRadio").checked) {
         const notes = midi.tracks[track].notes;
@@ -56,9 +61,12 @@ function down(e) {
     }
 }
 
-function pause() { paused = true; oscillator.frequency.value = 0; }
+function forwards() { 
+    index += +document.getElementById("distance").value;
+    if (index >= frequencies.length) { index = frequencies.length; } 
+}
 
-function previous() { if (index > 0) { index--; } }
+function pause() { paused = true; oscillator.frequency.value = 0; }
 
 function release(e) {
     const touches = e.changedTouches;
@@ -161,7 +169,8 @@ fileInput.addEventListener("change", () => {
 document.getElementById("start").addEventListener("click", start);
 document.getElementById("pause").addEventListener("click", pause);
 document.getElementById("resume").addEventListener("click", resume);
-document.getElementById("previous").addEventListener("click", previous);
+document.getElementById("backwards").addEventListener("click", backwards);
+document.getElementById("forwards").addEventListener("click", forwards);
 document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
 document.addEventListener("touchstart", touch);
