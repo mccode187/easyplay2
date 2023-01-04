@@ -1,6 +1,7 @@
 const audioContext = new AudioContext();
 const badKeys = ["Alt","Arrow","Audio","Enter","Launch","Meta","Play","Tab"];
 const display = document.getElementById("display");
+const emptyLine = " ".repeat(128);
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
@@ -21,6 +22,7 @@ function backwards() {
 }
 
 function convertNotesToFrequencies() {
+    display.value += emptyLine + "\n";
     if (document.getElementById("fileRadio").checked) {
         const notes = midi.tracks[track].notes;
         for (let i = 0; i < notes.length; i++) {
@@ -30,9 +32,10 @@ function convertNotesToFrequencies() {
             frequencies.push(frequency);
             const indent = notes[i].midi;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
-            display.value += line + "\n";
-            const line2 = " ".repeat(128);
-            display.value += line2 + "\n";
+            display.value += line + "\n" + emptyLine;
+            if (i < notes.length - 1) {
+                display.value += "\n";
+            }
         }
     } else {
         for (i = 0; i < notes.length; i++) {
@@ -49,24 +52,24 @@ function convertNotesToFrequencies() {
             frequencies.push(frequency);
             const indent = pitch + (octave + 1) * 12;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
-            display.value += line + "\n";
-            const line2 = " ".repeat(128);
-            display.value += line2 + "\n";
+            display.value += line + "\n" + emptyLine;
+            if (i < notes.length - 1) {
+                display.value += "\n";
+            }
         }
     }
-    display.focus();
+    adjustDisplay();
     display.scrollTop = 0;
     display.scrollLeft = display.clientWidth / 2;
 }
 
 function adjustDisplay() {
-    let start; let end;
     if (pressedKey) {
+        start = (index * 2 + 1) * 129;
+        end = (index * 2 + 2) * 129;
+    } else {
         start = (index * 2) * 129;
         end = (index * 2 + 1) * 129;
-    } else {
-        start = (index * 2 - 1) * 129;
-        end = (index * 2) * 129;
     }
 
     display.blur();
@@ -93,12 +96,14 @@ function down(e) {
         pressedKey = e.key;
         adjustDisplay();
         index++; 
-    } else if (e.key.includes("Arrow")) {
+    } else if (e.key.includes("Arrow") && (pressedKey === null)) {
         if (e.key.includes("Up")) {
             index--;
+            if (index <= 0) { index = 0; }
             adjustDisplay();
         } else if (e.key.includes("Down")) {
             index++;
+            if (index >= frequencies.length) { index = frequencies.length; }
             adjustDisplay();
         }
     }
