@@ -16,9 +16,12 @@ oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
 
 function backwards() { 
-    index -= +document.getElementById("distance").value;
-    if (index < 0) { index = 0; }
-    adjustDisplay();
+    const times = +document.getElementById("distance").value;
+    for (let i = 0; i < times; i++) {
+        index--;
+        if (index < 0) { index = 0; }
+        adjustDisplay();
+    }
 }
 
 function convertNotesToFrequencies() {
@@ -120,9 +123,12 @@ display.addEventListener("keydown", function(e) {
 }, false);
 
 function forwards() { 
-    index += +document.getElementById("distance").value;
-    if (index >= frequencies.length) { index = frequencies.length; }
-    adjustDisplay();
+    const times = +document.getElementById("distance").value;
+    for (let i = 0; i < times; i++) {
+        index++;
+        if (index >= frequencies.length) { index = frequencies.length; }
+        adjustDisplay();
+    }
 }
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
