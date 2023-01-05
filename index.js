@@ -184,12 +184,12 @@ function resetVariables() {
 function resume() { paused = false; }
 
 function start() { 
-    document.getElementById("state").value = "Loading...";
+    state.value = "Loading...";
     window.setTimeout(() => {
         resetVariables(); 
         convertNotesToFrequencies();
         startOscillatorIfNeccessary();
-        document.getElementById("state").value = "Ready";
+        state.value = "Ready";
     });
 }
 
