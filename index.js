@@ -27,46 +27,40 @@ function backwards() {
 
 function convertNotesToFrequencies() {
     if (document.getElementById("fileRadio").checked) {
-        const notes = midi.tracks[track].notes;
-        for (let i = 0; i < notes.length; i++) {
-            const pitch = notes[i].midi - 60;
-            let frequency = tuningFrequency;
-            frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
-            frequencies.push(frequency);
-            let noteText = notes[i].name.toLowerCase();
+        notes = midi.tracks[track].notes;
+    }
+    for (let i = 0; i < notes.length; i++) {
+        let pitch; let indent; let noteText;
+        if (document.getElementById("fileRadio").checked) {
+            pitch = notes[i].midi - 60;
+            indent = notes[i].midi;
+            noteText = notes[i].name.toLowerCase();
             noteText += " ".repeat(4 - noteText.length);
-            const indent = notes[i].midi;
-            const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
-            display.value += line + noteText + "\n" + emptyLine;
-            if (i < notes.length - 1) {
-                display.value += "\n";
-            }
-        }
-    } else {
-        for (i = 0; i < notes.length; i++) {
+        } else {
             const note = notes[i].split('');
-            let noteText = notes[i];
+            noteText = notes[i];
             if (+note.at(-1)) { 
                 octave = +note.pop(); 
             } else {
                 noteText += octave;
             }
             noteText += " ".repeat(4 - noteText.length);
-            let pitch = 0;
+            pitch = 0;
             while (note.length) {
                 pitch += value[note.pop()];
             }
-            let frequency = tuningFrequency;
-            frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
-            frequencies.push(frequency);
-            const indent = pitch + (octave + 1) * 12;
-            const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
-            display.value += line + noteText + "\n" + emptyLine;
-            if (i < notes.length - 1) {
-                display.value += "\n";
-            }
+            indent = pitch + (octave + 1) * 12;
+
         }
-    }
+        let frequency = tuningFrequency;
+        frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
+        frequencies.push(frequency);
+        const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
+        display.value += line + noteText + "\n" + emptyLine;
+        if (i < notes.length - 1) {
+            display.value += "\n";
+        }
+    } 
     adjustDisplay();
     display.scrollTop = 0;
     display.scrollLeft = display.clientWidth / 2;
