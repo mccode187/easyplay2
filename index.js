@@ -16,7 +16,29 @@ let track;
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
 
+function adjustDisplay() {
+    function helper(d, start, end) {
+        d.blur();
+        d.selectionStart = d.selectionEnd = start;
+        d.blur();
+        d.focus();
+        d.selectionStart = start;
+        d.selectionEnd = end;
+        d.scrollLeft = d.clientWidth / 2;
+    }
+    
+    let displayWidth = 128 + 4 + 1;
+    let start = (index * 2) * displayWidth;
+    let end = (index * 2 + 1) * displayWidth;
 
+    helper(display, start, end);
+
+    if (pressedKey) {
+        helper(display, start + displayWidth, end + displayWidth);
+    }
+}
+
+function backwards() { move(-1); }
 
 function convertNotesToFrequencies() {
     if (document.getElementById("fileRadio").checked) {
@@ -59,28 +81,6 @@ function convertNotesToFrequencies() {
     display.scrollLeft = display.clientWidth / 2;
 }
 
-function helper(d, start, end) {
-    d.blur();
-    d.selectionStart = d.selectionEnd = start;
-    d.blur();
-    d.focus();
-    d.selectionStart = start;
-    d.selectionEnd = end;
-    d.scrollLeft = d.clientWidth / 2;
-}
-
-function adjustDisplay() {
-    let displayWidth = 128 + 4 + 1;
-    let start = (index * 2) * displayWidth;
-    let end = (index * 2 + 1) * displayWidth;
-
-    helper(display, start, end);
-
-    if (pressedKey) {
-        helper(display, start + displayWidth, end + displayWidth);
-    }
-}
-
 function down(e) {
     if (on && !badKeys.some(badKey => e.key.includes(badKey)) && !e.repeat 
             && (e.key != pressedKey) && (index < frequencies.length) 
@@ -109,11 +109,9 @@ function down(e) {
     }
 }
 
-display.addEventListener("keydown", function(e) {
-    if (["Space","ArrowUp","ArrowDown"].indexOf(e.code) > -1) {
-        e.preventDefault();
-    }
-}, false);
+function forwards() { move(1); }
+
+function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
 
 function move(step) {
     const times = +document.getElementById("distance").value;
@@ -124,10 +122,6 @@ function move(step) {
         adjustDisplay();
     }
 }
-function forwards() { move(1); }
-function backwards() { move(-1); }
-
-function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
@@ -248,3 +242,8 @@ document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
 document.addEventListener("touchstart", touch);
 document.addEventListener("touchend", release);
+display.addEventListener("keydown", function(e) {
+    if (["Space","ArrowUp","ArrowDown"].indexOf(e.key) > -1) {
+        e.preventDefault();
+    }
+}, false);
