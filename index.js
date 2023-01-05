@@ -44,9 +44,13 @@ function convertNotesToFrequencies() {
     } else {
         for (i = 0; i < notes.length; i++) {
             const note = notes[i].split('');
+            let noteText = notes[i];
             if (+note.at(-1)) { 
                 octave = +note.pop(); 
+            } else {
+                noteText += octave;
             }
+            noteText += " ".repeat(4 - noteText.length);
             let pitch = 0;
             while (note.length) {
                 pitch += value[note.pop()];
@@ -54,8 +58,6 @@ function convertNotesToFrequencies() {
             let frequency = tuningFrequency;
             frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
             frequencies.push(frequency);
-            let noteText = notes[i];
-            noteText += " ".repeat(4 - noteText.length);
             const indent = pitch + (octave + 1) * 12;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
             display.value += line + noteText + "\n" + emptyLine;
