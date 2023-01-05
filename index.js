@@ -137,6 +137,10 @@ function forwards() {
     }
 }
 
+function help() {
+    location.href = "https://mcchu.com/easyplayhelp/";
+}
+
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
 function release(e) {
@@ -251,6 +255,7 @@ document.getElementById("pause").addEventListener("click", pause);
 document.getElementById("resume").addEventListener("click", resume);
 document.getElementById("backwards").addEventListener("click", backwards);
 document.getElementById("forwards").addEventListener("click", forwards);
+document.getElementById("help").addEventListener("click", help);
 document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
 document.addEventListener("touchstart", touch);
