@@ -44,28 +44,22 @@ function convertNotesToFrequencies() {
         notes = midi.tracks[track].notes;
     }
     for (let i = 0; i < notes.length; i++) {
-        let pitch; let indent; let noteText;
+        let pitch; let indent; let noteText; let note; let chars;
         if (document.getElementById("fileRadio").checked) {
-            pitch = notes[i].midi - 60;
-            indent = notes[i].midi;
-            noteText = notes[i].name.toLowerCase();
-            noteText += " ".repeat(4 - noteText.length);
+            note = notes[i].name.toLowerCase();
         } else {
-            const note = notes[i].split('');
-            noteText = notes[i];
-            if (+note.at(-1)) { 
-                octave = +note.pop(); 
-            } else {
-                noteText += octave;
-            }
-            noteText += " ".repeat(4 - noteText.length);
-            pitch = 0;
-            while (note.length) {
-                pitch += value[note.pop()];
-            }
-            indent = pitch + (octave + 1) * 12;
-
+            note = notes[i];
         }
+        chars = note.split('');
+        noteText = note;
+        if (+chars.at(-1)) { octave = +chars.pop(); } 
+        else { noteText += octave; }
+        noteText += " ".repeat(4 - noteText.length);
+        pitch = 0;
+        while (chars.length) {
+            pitch += value[chars.pop()];
+        }
+        indent = pitch + (octave + 1) * 12;
         let frequency = tuningFrequency;
         frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
         frequencies.push(frequency);
