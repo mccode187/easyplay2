@@ -5,6 +5,7 @@ const emptyLine = " ".repeat(128 + 4);
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
+const state = document.getElementById("state");
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
@@ -182,8 +183,15 @@ function resetVariables() {
 
 function resume() { paused = false; }
 
-function start() { resetVariables(); convertNotesToFrequencies();
-    startOscillatorIfNeccessary(); }
+function start() { 
+    document.getElementById("state").value = "Loading...";
+    window.setTimeout(() => {
+        resetVariables(); 
+        convertNotesToFrequencies();
+        startOscillatorIfNeccessary();
+        document.getElementById("state").value = "Ready";
+    });
+}
 
 function startOscillatorIfNeccessary() {
     if (!on) { 
