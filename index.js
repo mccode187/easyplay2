@@ -1,7 +1,6 @@
 const audioContext = new AudioContext();
 const badKeys = ["Alt","Arrow","Audio","Enter","Launch","Meta","Play","Tab"];
 const display = document.getElementById("display");
-//const displayText = document.getElementById("displayText");
 const emptyLine = " ".repeat(128 + 4);
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
@@ -38,10 +37,8 @@ function convertNotesToFrequencies() {
             const indent = notes[i].midi;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
             display.value += line + noteText + "\n" + emptyLine;
-            //displayText.value += noteText;
             if (i < notes.length - 1) {
                 display.value += "\n";
-                //displayText.value += "\n\n";
             }
         }
     } else {
@@ -57,9 +54,11 @@ function convertNotesToFrequencies() {
             let frequency = tuningFrequency;
             frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
             frequencies.push(frequency);
+            let noteText = notes[i];
+            noteText += " ".repeat(4 - noteText.length);
             const indent = pitch + (octave + 1) * 12;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
-            display.value += line + "\n" + emptyLine;
+            display.value += line + noteText + "\n" + emptyLine;
             if (i < notes.length - 1) {
                 display.value += "\n";
             }
@@ -84,14 +83,11 @@ function adjustDisplay() {
     let displayWidth = 128 + 4 + 1;
     let start = (index * 2) * displayWidth;
     let end = (index * 2 + 1) * displayWidth;
-    //displayTextWidth = 5;
 
     helper(display, start, end);
-    //helper(displayText, start * displayTextWidth, end * displayTextWidth);
 
     if (pressedKey) {
         helper(display, start + displayWidth, end + displayWidth);
-        //helper(displayText, start + displayTextWidth, end + displayTextWidth);
     }
 }
 
@@ -179,7 +175,6 @@ function resetVariables() {
     }
     gainNode.gain.value = 0;
     display.value = emptyLine + "\n";
-    //displayText.value = "\n";
     paused = false;
 }
 
