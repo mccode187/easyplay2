@@ -1,7 +1,8 @@
 const audioContext = new AudioContext();
 const badKeys = ["Alt","Arrow","Audio","Enter","Launch","Meta","Play","Tab"];
 const display = document.getElementById("display");
-const emptyLine = " ".repeat(128);
+//const displayText = document.getElementById("displayText");
+const emptyLine = " ".repeat(128 + 4);
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
@@ -25,7 +26,6 @@ function backwards() {
 }
 
 function convertNotesToFrequencies() {
-    display.value += emptyLine + "\n";
     if (document.getElementById("fileRadio").checked) {
         const notes = midi.tracks[track].notes;
         for (let i = 0; i < notes.length; i++) {
@@ -33,11 +33,15 @@ function convertNotesToFrequencies() {
             let frequency = tuningFrequency;
             frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
             frequencies.push(frequency);
+            let noteText = notes[i].name.toLowerCase();
+            noteText += " ".repeat(4 - noteText.length);
             const indent = notes[i].midi;
             const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
-            display.value += line + "\n" + emptyLine;
+            display.value += line + noteText + "\n" + emptyLine;
+            //displayText.value += noteText;
             if (i < notes.length - 1) {
                 display.value += "\n";
+                //displayText.value += "\n\n";
             }
         }
     } else {
@@ -66,25 +70,28 @@ function convertNotesToFrequencies() {
     display.scrollLeft = display.clientWidth / 2;
 }
 
-function helper(start, end) {
-    display.blur();
-    display.selectionStart = display.selectionEnd = start;
-    display.blur();
-    display.focus();
-    display.selectionStart = start;
-    display.selectionEnd = end;
-    display.scrollLeft = display.clientWidth / 2;
+function helper(d, start, end) {
+    d.blur();
+    d.selectionStart = d.selectionEnd = start;
+    d.blur();
+    d.focus();
+    d.selectionStart = start;
+    d.selectionEnd = end;
+    d.scrollLeft = d.clientWidth / 2;
 }
 
 function adjustDisplay() {
-    let start = (index * 2) * 129;
-    let end = (index * 2 + 1) * 129;
-    helper(start, end);
+    let displayWidth = 128 + 4 + 1;
+    let start = (index * 2) * displayWidth;
+    let end = (index * 2 + 1) * displayWidth;
+    //displayTextWidth = 5;
+
+    helper(display, start, end);
+    //helper(displayText, start * displayTextWidth, end * displayTextWidth);
 
     if (pressedKey) {
-        start += 129
-        end += 129
-        helper(start, end);
+        helper(display, start + displayWidth, end + displayWidth);
+        //helper(displayText, start + displayTextWidth, end + displayTextWidth);
     }
 }
 
@@ -171,7 +178,8 @@ function resetVariables() {
         normalGain = 0.15;
     }
     gainNode.gain.value = 0;
-    display.value = "";
+    display.value = emptyLine + "\n";
+    //displayText.value = "\n";
     paused = false;
 }
 
