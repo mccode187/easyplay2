@@ -9,9 +9,8 @@ const state = document.getElementById("state");
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
-let frequencies = []; let index; let midi; let normalGain; let notes; 
-let octave; let on = false; let paused; let pressedKey; let touchedFinger; 
-let track; 
+let activePress; let frequencies = []; let index; let midi; let normalGain; 
+let notes; let octave; let on = false; let paused; let track; 
 
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
@@ -33,7 +32,7 @@ function adjustDisplay() {
 
     helper(display, start, end);
 
-    if (pressedKey) {
+    if (activePress !== null) {
         helper(display, start + displayWidth, end + displayWidth);
     }
 }
@@ -82,10 +81,14 @@ function convertNotesToFrequencies() {
 }
 
 function down(e) {
-    if (on && !badKeys.some(badKey => e.key.includes(badKey)) && !e.repeat 
-            && (e.key != pressedKey) && (index < frequencies.length) 
-            && !paused && (document.activeElement.nodeName !== 'INPUT')) {
-        if (pressedKey === null) {
+    let press;
+    if (e.type === "keydown") { press = e.key; } 
+    else { press = e.changedTouches[0].identifier; }
+    strPress = "" + press;
+    if (on && !badKeys.some(badKey => strPress.includes(badKey)) && !paused
+        && (index < frequencies.length) && !e.repeat && (press != activePress)
+        && (document.activeElement.nodeName !== 'INPUT')) {
+        if (activePress === null) {
             oscillator.frequency.value = frequencies[index];
             gainNode.gain.setTargetAtTime(normalGain, 
                 audioContext.currentTime, 0.015);
@@ -93,19 +96,12 @@ function down(e) {
             oscillator.frequency.setTargetAtTime(frequencies[index], 
                 audioContext.currentTime, 0.003)    
         }
-        pressedKey = e.key;
+        activePress = press;
         adjustDisplay();
-        index++; 
-    } else if (e.key.includes("Arrow") && (pressedKey === null)) {
-        if (e.key.includes("Up")) {
-            index--;
-            if (index <= 0) { index = 0; }
-            adjustDisplay();
-        } else if (e.key.includes("Down")) {
-            index++;
-            if (index >= frequencies.length) { index = frequencies.length; }
-            adjustDisplay();
-        }
+        index++;
+    } else if (strPress.includes("Arrow") && (activePress === null)) {
+        if (strPress.includes("Up")) { move(-1) }
+        else if (strPress.includes("Down")) { move(1); }
     }
 }
 
@@ -125,19 +121,8 @@ function move(step) {
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
-function release(e) {
-    const touches = e.changedTouches;
-    for (let i = 0; i < touches.length; i++) {
-        if (on && touches.item(i).identifier === touchedFinger) {
-            gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
-            touchedFinger = null;
-        }
-    }
-}
-
 function resetVariables() {
-    pressedKey = null; 
-    touchedFinger = null;
+    activePress = null; 
     index = 0;
     frequencies = [];
     tuningNote = document.getElementById("tuningNote").value;
@@ -186,29 +171,13 @@ function startOscillatorIfNeccessary() {
     }
 }
 
-function touch(e) {
-    const touches = e.changedTouches;
-    for (let i = 0; i < touches.length; i++) {
-        if (on && !(touches.item(i).identifier === touchedFinger)
-             && index < frequencies.length) {
-                if (touchedFinger === null) {
-                    oscillator.frequency.value = frequencies[index];
-                    gainNode.gain.setTargetAtTime(normalGain, 
-                        audioContext.currentTime, 0.015);
-                } else {
-                    oscillator.frequency.setTargetAtTime(frequencies[index], 
-                        audioContext.currentTime, 0.003)    
-                }
-                index++;
-                touchedFinger = e.changedTouches.item(i).identifier;
-        }
-    }
-}
-
 function up(e) {
-    if (on && (e.key === pressedKey)) {
+    let press;
+    if (e.type === "keyup") { press = e.key; } 
+    else { press = e.changedTouches[0].identifier; }
+    if (on && (press === activePress)) {
         gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
-        pressedKey = null;
+        activePress = null;
         adjustDisplay();
     }
 }
@@ -240,8 +209,8 @@ document.getElementById("forwards").addEventListener("click", forwards);
 document.getElementById("help").addEventListener("click", help);
 document.addEventListener("keydown", down);
 document.addEventListener("keyup", up);
-document.addEventListener("touchstart", touch);
-document.addEventListener("touchend", release);
+document.addEventListener("touchstart", down);
+document.addEventListener("touchend", up);
 display.addEventListener("keydown", function(e) {
     if (["Space","ArrowUp","ArrowDown"].indexOf(e.key) > -1) {
         e.preventDefault();
