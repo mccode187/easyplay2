@@ -16,14 +16,7 @@ let track;
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
 
-function backwards() { 
-    const times = +document.getElementById("distance").value;
-    for (let i = 0; i < times; i++) {
-        index--;
-        if (index < 0) { index = 0; }
-        adjustDisplay();
-    }
-}
+
 
 function convertNotesToFrequencies() {
     if (document.getElementById("fileRadio").checked) {
@@ -122,18 +115,19 @@ display.addEventListener("keydown", function(e) {
     }
 }, false);
 
-function forwards() { 
+function move(step) {
     const times = +document.getElementById("distance").value;
     for (let i = 0; i < times; i++) {
-        index++;
+        index += step;
         if (index >= frequencies.length) { index = frequencies.length; }
+        if (index < 0) { index = 0; }
         adjustDisplay();
     }
 }
+function forwards() { move(1); }
+function backwards() { move(-1); }
 
-function help() {
-    location.href = "https://mcchu.com/easyplayhelp/";
-}
+function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
