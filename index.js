@@ -43,8 +43,7 @@ function convertNotesToFrequencies() {
             + note.text + " ".repeat(4 - note.text.length) + "\n" + emptyLine;        
         if (i < notes.length - 1) {display.value += "\n";}
     } 
-    adjustDisplay(); 
-    display.scrollTop = 0; display.scrollLeft = display.clientWidth / 2;
+    adjustDisplay(); display.scrollTop = 0;
 }
 
 function down(e) {
