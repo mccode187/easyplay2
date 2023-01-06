@@ -6,6 +6,7 @@ const fileInput = byId("fileInput");
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
+const select = byId("track");
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let activePress; let frequencies; let index; let midi; let normalGain; 
@@ -144,15 +145,11 @@ fileInput.addEventListener("change", () => {
 });
 reader.addEventListener("load", (e) => {
     midi = new Midi(e.target.result);
-    const select = byId("track");
-    while (select.options.length) { select.options.remove(0); }
+    while (select.options.length) {select.options.remove(0);}
     for (let i = 0; i < midi.tracks.length; i++) {
-        let t = midi.tracks[i];
         const option = document.createElement("option");
-        option.text = t.name;
-        select.add(option);
+        option.text = midi.tracks[i].name; select.add(option);
     }
-    console.log(midi);
 });
 const touchstart = keydown; const touchend = keyup;
 const buttonFuncs = [start,pause,resume,backwards,forwards,help];
