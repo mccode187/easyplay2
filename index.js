@@ -14,25 +14,16 @@ let notes; let octave; let on = false; let paused; let tuning;
 oscillator.connect(gainNode).connect(audioContext.destination); resetVars();
 
 function adjustDisplay() {
-    function helper(d, start, end) {
-        d.blur();
-        d.selectionStart = d.selectionEnd = start;
-        d.blur();
-        d.focus();
-        d.selectionStart = start;
-        d.selectionEnd = end;
-        d.scrollLeft = d.clientWidth / 2;
+    function goTo() {
+        display.blur();
+        display.selectionStart = display.selectionEnd = start;
+        display.blur();
+        display.focus();
+        display.selectionStart = start;
+        display.selectionEnd = start + width;
     }
-    
-    let displayWidth = 128 + 4 + 1;
-    let start = (index * 2) * displayWidth;
-    let end = (index * 2 + 1) * displayWidth;
-
-    helper(display, start, end);
-
-    if (activePress !== null) {
-        helper(display, start + displayWidth, end + displayWidth);
-    }
+    const width = 128 + 4 + 1; let start = (index * 2) * width; goTo();
+    if (activePress !== null) {start += width; goTo();}
 }
 
 function backwards() { move(-1,+byId("distance").value); }
