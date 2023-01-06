@@ -80,7 +80,7 @@ function keydown(e) {
         adjustDisplay();
         index++;
     } else if (strPress.includes("Arrow") && (activePress === null)) {
-        if (strPress.includes("Up")) { move(-1,1) }
+        if (strPress.includes("Up")) { move(-1,1); }
         else if (strPress.includes("Down")) { move(1,1); }
     }
 }
