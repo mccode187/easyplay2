@@ -40,6 +40,7 @@ function backwards() { move(-1,+byId("distance").value); }
 function byId(id) { return document.getElementById(id); };
 
 function convertNotesToFrequencies() {
+    octave = 4;
     for (let i = 0; i < notes.length; i++) {
         const note = unbundle(notes[i]);
         frequencies.push(tuning.frequency * 2**((note.pitch - tuning.pitch)/12 
@@ -108,24 +109,20 @@ function move(step, times) {
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
 function resetVars() {
-    activePress = null; 
-    index = 0;
-    frequencies = [];
+    activePress = null; frequencies = []; index = 0; octave = 4; paused = false;
     tuning = unbundle(byId("tuningNote").value);
     tuning.frequency = +byId("tuningFrequency").value;
     if (byId("fileRadio").checked) {
         const track = byId("track").selectedIndex;
-        notes = midi.tracks[track].notes.map(x => x.name.toLowerCase());
+        notes = midi.tracks[track].notes.map(x => format(x.name));
     } else {
         notes = format(byId("notes").value).split(/\s+/);
     }
-    octave = 4;
     const proposedGain = +byId("gain").value;
     if (proposedGain <= 1 && proposedGain >= 0) {normalGain = proposedGain;} 
     else {normalGain = 0.15;}
     gainNode.gain.value = 0;
     display.value = emptyLine + "\n";
-    paused = false;
 }
 
 function resume() { paused = false; }
