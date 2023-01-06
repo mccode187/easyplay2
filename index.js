@@ -10,7 +10,7 @@ const select = byId("track");
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
 let activePress; let frequencies; let index; let midi; let normalGain; 
-let notes; let octave; let on = false; let paused; let tuning;
+let notes; let octave; let on = false; let paused; let press; let tuning;
 
 oscillator.connect(gainNode).connect(audioContext.destination); resetVars();
 
@@ -18,8 +18,7 @@ function adjustDisplay() {
     function goTo() {
         display.blur();
         display.selectionStart = display.selectionEnd = start;
-        display.blur();
-        display.focus();
+        display.blur(); display.focus();
         display.selectionStart = start;
         display.selectionEnd = start + width;
     }
@@ -42,22 +41,11 @@ function convertNotesToFrequencies() {
             + note.text + " ".repeat(4 - note.text.length) + "\n" + emptyLine;        
         if (i < notes.length - 1) {display.value += "\n";}
     } 
-    adjustDisplay();
-    display.scrollTop = 0;
-    display.scrollLeft = display.clientWidth / 2;
+    adjustDisplay(); display.scrollTop = 0;
 }
 
-function format(x) {return x.trim().toLowerCase();}
-
-function forwards() { move(1,+byId("distance").value); }
-
-function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
-
-function keydown(e) {
-    let press; 
-    if (e.type === "keydown") {press = e.key;} 
-    else {press = e.changedTouches[0].identifier;}
-    strPress = "" + press;
+function down(e) {
+    const strPress = "" + press;
     if (on && !badKeys.some(badKey => strPress.includes(badKey)) && !paused
         && (index < frequencies.length) && !e.repeat && (press != activePress)
         && (document.activeElement.nodeName !== 'INPUT')) {
@@ -69,24 +57,23 @@ function keydown(e) {
             oscillator.frequency.setTargetAtTime(frequencies[index], 
                 audioContext.currentTime, 0.003)    
         }
-        activePress = press;
-        adjustDisplay();
-        index++;
+        activePress = press; adjustDisplay(); index++;
     } else if (strPress.includes("Arrow") && (activePress === null)) {
         if (strPress.includes("Up")) { move(-1,1); }
         else if (strPress.includes("Down")) { move(1,1); }
     }
 }
 
-function keyup(e) {
-    let press;
-    if (e.type === "keyup") { press = e.key; } 
-    else { press = e.changedTouches[0].identifier; }
-    if (on && (press === activePress)) {
-        gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
-        activePress = null;
-        adjustDisplay();
-    }
+function format(x) {return x.trim().toLowerCase();}
+
+function forwards() { move(1,+byId("distance").value); }
+
+function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
+
+function key(e) { 
+    if (e.type.includes("key")) {press = e.key;} 
+    else {press = e.changedTouches[0].identifier;}
+    if (["keydown","touchstart"].includes(e.type)) {down(e);} else {up(e);}
 }
 
 function move(step, times) {
@@ -131,17 +118,22 @@ function start() {
 function unbundle(note) {
     let text = format(note); note = text.split('');
     if (+note.at(-1)) {octave = +note.pop();} else {text += octave;}
-    let pitch = 0;
-    while (note.length) { pitch += value[note.pop()]; }
+    let pitch = 0; while (note.length) { pitch += value[note.pop()]; }
     return {pitch:pitch, octave:octave, text:text};
+}
+
+function up(e) {
+    if (on && (press === activePress)) {
+        gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
+        activePress = null; adjustDisplay();
+    }
 }
 
 display.addEventListener("keydown", (e) => {
     if (["Space","ArrowUp","ArrowDown"].includes(e.key)) {e.preventDefault();}
 });
 fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (file) {reader.readAsArrayBuffer(file);}
+    const file = fileInput.files[0]; if (file) {reader.readAsArrayBuffer(file);}
 });
 reader.addEventListener("load", (e) => {
     midi = new Midi(e.target.result);
@@ -155,4 +147,4 @@ const touchstart = (e) => {keydown(e);}; const touchend = (e) => {keyup(e);};
 const buttonFuncs = [start,pause,resume,backwards,forwards,help];
 const documentFuncs = [keydown,keyup,touchstart,touchend];
 for (f of buttonFuncs) {byId(f.name).addEventListener("click", f);} 
-for (f of documentFuncs) {document.addEventListener(f.name, f);}
+for (f of documentFuncs) {document.addEventListener(f.name, key);}
