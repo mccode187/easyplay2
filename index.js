@@ -2,16 +2,16 @@ const audioContext = new AudioContext();
 const badKeys = ["Alt","Arrow","Audio","Enter","Launch","Meta","Play","Tab"];
 const display = byId("display");
 const emptyLine = " ".repeat(128 + 4);
+const fileInput = byId("fileInput");
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
-let activePress; let frequencies = []; let index; let midi; let normalGain; 
+let activePress; let frequencies; let index; let midi; let normalGain; 
 let notes; let octave; let on = false; let paused; let tuning;
 
-oscillator.connect(gainNode).connect(audioContext.destination);
-resetVariables();
+oscillator.connect(gainNode).connect(audioContext.destination); resetVars();
 
 function adjustDisplay() {
     function helper(d, start, end) {
@@ -107,7 +107,7 @@ function move(step, times) {
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
-function resetVariables() {
+function resetVars() {
     activePress = null; 
     index = 0;
     frequencies = [];
@@ -133,15 +133,10 @@ function resume() { paused = false; }
 function start() { 
     byId("state").value = "Loading...";
     window.setTimeout(() => {
-        resetVariables(); 
-        convertNotesToFrequencies();
-        startOscillatorIfNeccessary();
+        resetVars(); convertNotesToFrequencies();
+        if (!on) {oscillator.start(); on = true;}
         byId("state").value = "Ready";
     });
-}
-
-function startOscillatorIfNeccessary() {
-    if (!on) {oscillator.start(); on = true;}
 }
 
 function unbundle(note) {
@@ -152,7 +147,14 @@ function unbundle(note) {
     return {pitch:pitch, octave:octave, text:text};
 }
 
-reader.onload = function(e) {
+display.addEventListener("keydown", function(e) {
+    if (["Space","ArrowUp","ArrowDown"].includes(e.key)) {e.preventDefault();}
+}, false);
+fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file) {reader.readAsArrayBuffer(file);}
+});
+reader.addEventListener("load", (e) => {
     midi = new Midi(e.target.result);
     const select = byId("track");
     while (select.options.length) { select.options.remove(0); }
@@ -163,20 +165,9 @@ reader.onload = function(e) {
         select.add(option);
     }
     console.log(midi);
-}
-
-const fileInput = byId("fileInput");
-fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (file) {reader.readAsArrayBuffer(file);}
 });
 const touchstart = keydown; const touchend = keyup;
 const buttonFuncs = [start,pause,resume,backwards,forwards,help];
 const documentFuncs = [keydown,keyup,touchstart,touchend];
 for (f of buttonFuncs) {byId(f.name).addEventListener("click", f);} 
 for (f of documentFuncs) {document.addEventListener(f.name, f);}
-display.addEventListener("keydown", function(e) {
-    if (["Space","ArrowUp","ArrowDown"].indexOf(e.key) > -1) {
-        e.preventDefault();
-    }
-}, false);
