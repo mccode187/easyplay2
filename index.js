@@ -151,7 +151,7 @@ reader.addEventListener("load", (e) => {
         option.text = midi.tracks[i].name; select.add(option);
     }
 });
-const touchstart = keydown; const touchend = keyup;
+const touchstart = (e) => {keydown(e);}; const touchend = (e) => {keyup(e);};
 const buttonFuncs = [start,pause,resume,backwards,forwards,help];
 const documentFuncs = [keydown,keyup,touchstart,touchend];
 for (f of buttonFuncs) {byId(f.name).addEventListener("click", f);} 
