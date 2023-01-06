@@ -35,7 +35,7 @@ function adjustDisplay() {
     }
 }
 
-function backwards() { move(-1); }
+function backwards() { move(-1,+byId("distance").value); }
 
 function byId(id) { return document.getElementById(id); };
 
@@ -74,17 +74,18 @@ function down(e) {
         adjustDisplay();
         index++;
     } else if (strPress.includes("Arrow") && (activePress === null)) {
-        if (strPress.includes("Up")) { move(-1) }
-        else if (strPress.includes("Down")) { move(1); }
+        if (strPress.includes("Up")) { move(-1,1) }
+        else if (strPress.includes("Down")) { move(1,1); }
     }
 }
 
-function forwards() { move(1); }
+function format(x) {return x.trim().toLowerCase();}
+
+function forwards() { move(1,+byId("distance").value); }
 
 function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
 
-function move(step) {
-    const times = +byId("distance").value;
+function move(step, times) {
     for (let i = 0; i < times; i++) {
         index += step;
         if (index >= frequencies.length) { index = frequencies.length; }
@@ -94,16 +95,6 @@ function move(step) {
 }
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
-
-function format(x) {return x.trim().toLowerCase();}
-
-function unbundle(note) {
-    let text = format(note); note = text.split('');
-    if (+note.at(-1)) {octave = +note.pop();} else {text += octave;}
-    let pitch = 0;
-    while (note.length) { pitch += value[note.pop()]; }
-    return {pitch:pitch, octave:octave, text:text};
-}
 
 function resetVariables() {
     activePress = null; 
@@ -143,6 +134,14 @@ function startOscillatorIfNeccessary() {
         oscillator.start();
         on = true;
     }
+}
+
+function unbundle(note) {
+    let text = format(note); note = text.split('');
+    if (+note.at(-1)) {octave = +note.pop();} else {text += octave;}
+    let pitch = 0;
+    while (note.length) { pitch += value[note.pop()]; }
+    return {pitch:pitch, octave:octave, text:text};
 }
 
 function up(e) {
