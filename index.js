@@ -54,10 +54,16 @@ function convertNotesToFrequencies() {
     display.scrollLeft = display.clientWidth / 2;
 }
 
-function down(e) {
-    let press;
-    if (e.type === "keydown") { press = e.key; } 
-    else { press = e.changedTouches[0].identifier; }
+function format(x) {return x.trim().toLowerCase();}
+
+function forwards() { move(1,+byId("distance").value); }
+
+function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
+
+function keydown(e) {
+    let press; 
+    if (e.type === "keydown") {press = e.key;} 
+    else {press = e.changedTouches[0].identifier;}
     strPress = "" + press;
     if (on && !badKeys.some(badKey => strPress.includes(badKey)) && !paused
         && (index < frequencies.length) && !e.repeat && (press != activePress)
@@ -79,11 +85,16 @@ function down(e) {
     }
 }
 
-function format(x) {return x.trim().toLowerCase();}
-
-function forwards() { move(1,+byId("distance").value); }
-
-function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
+function keyup(e) {
+    let press;
+    if (e.type === "keyup") { press = e.key; } 
+    else { press = e.changedTouches[0].identifier; }
+    if (on && (press === activePress)) {
+        gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
+        activePress = null;
+        adjustDisplay();
+    }
+}
 
 function move(step, times) {
     for (let i = 0; i < times; i++) {
@@ -130,10 +141,7 @@ function start() {
 }
 
 function startOscillatorIfNeccessary() {
-    if (!on) { 
-        oscillator.start();
-        on = true;
-    }
+    if (!on) {oscillator.start(); on = true;}
 }
 
 function unbundle(note) {
@@ -142,17 +150,6 @@ function unbundle(note) {
     let pitch = 0;
     while (note.length) { pitch += value[note.pop()]; }
     return {pitch:pitch, octave:octave, text:text};
-}
-
-function up(e) {
-    let press;
-    if (e.type === "keyup") { press = e.key; } 
-    else { press = e.changedTouches[0].identifier; }
-    if (on && (press === activePress)) {
-        gainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.015);
-        activePress = null;
-        adjustDisplay();
-    }
 }
 
 reader.onload = function(e) {
@@ -173,12 +170,11 @@ fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (file) {reader.readAsArrayBuffer(file);}
 });
-const funcs = [start,pause,resume,backwards,forwards,help];
-for (f of funcs) {byId(f.name).addEventListener("click", f);} 
-document.addEventListener("keydown", down); 
-document.addEventListener("keyup", up);
-document.addEventListener("touchstart", down);
-document.addEventListener("touchend", up);
+const touchstart = keydown; const touchend = keyup;
+const buttonFuncs = [start,pause,resume,backwards,forwards,help];
+const documentFuncs = [keydown,keyup,touchstart,touchend];
+for (f of buttonFuncs) {byId(f.name).addEventListener("click", f);} 
+for (f of documentFuncs) {document.addEventListener(f.name, f);}
 display.addEventListener("keydown", function(e) {
     if (["Space","ArrowUp","ArrowDown"].indexOf(e.key) > -1) {
         e.preventDefault();
