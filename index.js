@@ -16,6 +16,7 @@ let tuning;
 oscillator.connect(gainNode).connect(audioContext.destination); resetVars();
 
 function adjustDisplay() {
+    document.getElementById("simpleDisplay").value = notes[index];
     function goTo() {
         display.blur();
         display.selectionStart = display.selectionEnd = start + indents[index];
