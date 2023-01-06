@@ -9,18 +9,19 @@ const reader = new FileReader();
 const select = byId("track");
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
-let activePress; let frequencies; let index; let midi; let normalGain; 
-let notes; let octave; let on = false; let paused; let press; let tuning;
+let activePress; let frequencies; let index; let indents; let midi; 
+let normalGain; let notes; let octave; let on = false; let paused; let press; 
+let tuning;
 
 oscillator.connect(gainNode).connect(audioContext.destination); resetVars();
 
 function adjustDisplay() {
     function goTo() {
         display.blur();
-        display.selectionStart = display.selectionEnd = start;
+        display.selectionStart = display.selectionEnd = start + indents[index];
         display.blur(); display.focus();
-        display.selectionStart = start;
-        display.selectionEnd = start + width;
+        display.selectionStart = start + indents[index];
+        display.selectionEnd = start + indents[index] + 1;
     }
     const width = 128 + 4 + 1; let start = (index * 2) * width; goTo();
     if (activePress !== null) {start += width; goTo();}
@@ -37,11 +38,13 @@ function convertNotesToFrequencies() {
         frequencies.push(tuning.frequency * 2**((note.pitch - tuning.pitch)/12 
                             + note.octave - tuning.octave));
         const indent = note.pitch + (note.octave + 1) * 12;
+        indents.push(indent);
         display.value += " ".repeat(indent) + "." + " ".repeat(128-indent-1) 
             + note.text + " ".repeat(4 - note.text.length) + "\n" + emptyLine;        
         if (i < notes.length - 1) {display.value += "\n";}
     } 
-    adjustDisplay(); display.scrollTop = 0;
+    adjustDisplay(); 
+    display.scrollTop = 0; display.scrollLeft = display.clientWidth / 2;
 }
 
 function down(e) {
@@ -88,7 +91,8 @@ function move(step, times) {
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
 function resetVars() {
-    activePress = null; frequencies = []; index = 0; octave = 4; paused = false;
+    activePress = null; frequencies = []; index = 0; indents = []; octave = 4; 
+    paused = false;
     tuning = unbundle(byId("tuningNote").value);
     tuning.frequency = +byId("tuningFrequency").value;
     if (byId("fileRadio").checked) {
