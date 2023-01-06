@@ -1,16 +1,14 @@
 const audioContext = new AudioContext();
 const badKeys = ["Alt","Arrow","Audio","Enter","Launch","Meta","Play","Tab"];
-const display = document.getElementById("display");
+const display = byId("display");
 const emptyLine = " ".repeat(128 + 4);
 const gainNode = new GainNode(audioContext);
 const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
-const state = document.getElementById("state");
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
 
-let tuningNote; let tuningPitch; let tuningOctave; let tuningFrequency;
 let activePress; let frequencies = []; let index; let midi; let normalGain; 
-let notes; let octave; let on = false; let paused; let track; 
+let notes; let octave; let on = false; let paused; let tuning;
 
 oscillator.connect(gainNode).connect(audioContext.destination);
 resetVariables();
@@ -39,29 +37,23 @@ function adjustDisplay() {
 
 function backwards() { move(-1); }
 
+function byId(id) { return document.getElementById(id); };
+
 function convertNotesToFrequencies() {
-    if (document.getElementById("fileRadio").checked) {
-        notes = midi.tracks[track].notes;
-    }
     for (let i = 0; i < notes.length; i++) {
-        let pitch; let indent; let noteText; let note; let chars;
-        if (document.getElementById("fileRadio").checked) {
-            note = notes[i].name.toLowerCase();
-        } else {
-            note = notes[i];
-        }
-        chars = note.split('');
-        noteText = note;
+        const note = notes[i];
+        let chars = note.split('');
+        let noteText = note;
         if (+chars.at(-1)) { octave = +chars.pop(); } 
         else { noteText += octave; }
         noteText += " ".repeat(4 - noteText.length);
-        pitch = 0;
+        let pitch = 0;
         while (chars.length) {
             pitch += value[chars.pop()];
         }
-        indent = pitch + (octave + 1) * 12;
-        let frequency = tuningFrequency;
-        frequency *= 2**((pitch - tuningPitch)/12 + octave - tuningOctave);
+        const indent = pitch + (octave + 1) * 12;
+        let frequency = tuning.frequency;
+        frequency *= 2**((pitch - tuning.pitch)/12 + octave - tuning.octave);
         frequencies.push(frequency);
         const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
         display.value += line + noteText + "\n" + emptyLine;
@@ -104,7 +96,7 @@ function forwards() { move(1); }
 function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
 
 function move(step) {
-    const times = +document.getElementById("distance").value;
+    const times = +byId("distance").value;
     for (let i = 0; i < times; i++) {
         index += step;
         if (index >= frequencies.length) { index = frequencies.length; }
@@ -115,32 +107,32 @@ function move(step) {
 
 function pause() { paused = true; oscillator.frequency.value = 0; }
 
+function format(x) {return x.trim().toLowerCase();}
+
+function unbundle(note) {
+    let pitch = 0; let octave = 4;
+    note = format(note).split('');
+    if (+note.at(-1)) { octave = +note.pop(); } 
+    while (note.length) { pitch += value[note.pop()]; }
+    return {pitch:pitch, octave:octave};
+}
+
 function resetVariables() {
     activePress = null; 
     index = 0;
     frequencies = [];
-    tuningNote = document.getElementById("tuningNote").value;
-    tuningNote = tuningNote.trim().toLowerCase().split('');
-    if (+tuningNote.at(-1)) { 
-        tuningOctave = +tuningNote.pop(); 
+    tuning = unbundle(byId("tuningNote").value);
+    tuning.frequency = +byId("tuningFrequency").value;
+    if (byId("fileRadio").checked) {
+        const track = byId("track").selectedIndex;
+        notes = midi.tracks[track].notes.map(x => x.name.toLowerCase());
     } else {
-        tuningOctave = 4;
+        notes = format(byId("notes").value).split(/\s+/);
     }
-    tuningPitch = 0;
-    while (tuningNote.length) {
-        tuningPitch += value[tuningNote.pop()];
-    }
-    tuningFrequency = +document.getElementById("tuningFrequency").value;
-    notes = document.getElementById("notes").value;
-    notes = notes.trim().toLowerCase().split(/\s+/);
     octave = 4;
-    track = document.getElementById("track").selectedIndex;
-    const proposedGain = +document.getElementById("gain").value;
-    if (proposedGain <= 1 && proposedGain >= 0) {
-        normalGain = +document.getElementById("gain").value;
-    } else {
-        normalGain = 0.15;
-    }
+    const proposedGain = +byId("gain").value;
+    if (proposedGain <= 1 && proposedGain >= 0) {normalGain = proposedGain;} 
+    else {normalGain = 0.15;}
     gainNode.gain.value = 0;
     display.value = emptyLine + "\n";
     paused = false;
@@ -149,12 +141,12 @@ function resetVariables() {
 function resume() { paused = false; }
 
 function start() { 
-    state.value = "Loading...";
+    byId("state").value = "Loading...";
     window.setTimeout(() => {
         resetVariables(); 
         convertNotesToFrequencies();
         startOscillatorIfNeccessary();
-        state.value = "Ready";
+        byId("state").value = "Ready";
     });
 }
 
@@ -178,7 +170,7 @@ function up(e) {
 
 reader.onload = function(e) {
     midi = new Midi(e.target.result);
-    const select = document.getElementById("track");
+    const select = byId("track");
     while (select.options.length) { select.options.remove(0); }
     for (let i = 0; i < midi.tracks.length; i++) {
         let t = midi.tracks[i];
@@ -189,19 +181,14 @@ reader.onload = function(e) {
     console.log(midi);
 }
 
-const fileInput = document.getElementById("fileInput");
+const fileInput = byId("fileInput");
 fileInput.addEventListener("change", () => {
-    resetVariables();
     const file = fileInput.files[0];
     if (file) {reader.readAsArrayBuffer(file);}
 });
-document.getElementById("start").addEventListener("click", start);
-document.getElementById("pause").addEventListener("click", pause);
-document.getElementById("resume").addEventListener("click", resume);
-document.getElementById("backwards").addEventListener("click", backwards);
-document.getElementById("forwards").addEventListener("click", forwards);
-document.getElementById("help").addEventListener("click", help);
-document.addEventListener("keydown", down);
+const funcs = [start,pause,resume,backwards,forwards,help];
+for (f of funcs) {byId(f.name).addEventListener("click", f);} 
+document.addEventListener("keydown", down); 
 document.addEventListener("keyup", up);
 document.addEventListener("touchstart", down);
 document.addEventListener("touchend", up);
