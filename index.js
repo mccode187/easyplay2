@@ -41,25 +41,13 @@ function byId(id) { return document.getElementById(id); };
 
 function convertNotesToFrequencies() {
     for (let i = 0; i < notes.length; i++) {
-        const note = notes[i];
-        let chars = note.split('');
-        let noteText = note;
-        if (+chars.at(-1)) { octave = +chars.pop(); } 
-        else { noteText += octave; }
-        noteText += " ".repeat(4 - noteText.length);
-        let pitch = 0;
-        while (chars.length) {
-            pitch += value[chars.pop()];
-        }
-        const indent = pitch + (octave + 1) * 12;
-        let frequency = tuning.frequency;
-        frequency *= 2**((pitch - tuning.pitch)/12 + octave - tuning.octave);
-        frequencies.push(frequency);
-        const line = " ".repeat(indent) + "." + " ".repeat(128-indent-1);
-        display.value += line + noteText + "\n" + emptyLine;
-        if (i < notes.length - 1) {
-            display.value += "\n";
-        }
+        const note = unbundle(notes[i]);
+        frequencies.push(tuning.frequency * 2**((note.pitch - tuning.pitch)/12 
+                            + note.octave - tuning.octave));
+        const indent = note.pitch + (note.octave + 1) * 12;
+        display.value += " ".repeat(indent) + "." + " ".repeat(128-indent-1) 
+            + note.text + " ".repeat(4 - note.text.length) + "\n" + emptyLine;        
+        if (i < notes.length - 1) {display.value += "\n";}
     } 
     adjustDisplay();
     display.scrollTop = 0;
@@ -110,11 +98,11 @@ function pause() { paused = true; oscillator.frequency.value = 0; }
 function format(x) {return x.trim().toLowerCase();}
 
 function unbundle(note) {
-    let pitch = 0; let octave = 4;
-    note = format(note).split('');
-    if (+note.at(-1)) { octave = +note.pop(); } 
+    let text = format(note); note = text.split('');
+    if (+note.at(-1)) {octave = +note.pop();} else {text += octave;}
+    let pitch = 0;
     while (note.length) { pitch += value[note.pop()]; }
-    return {pitch:pitch, octave:octave};
+    return {pitch:pitch, octave:octave, text:text};
 }
 
 function resetVariables() {
