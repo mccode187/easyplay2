@@ -136,9 +136,9 @@ function unbundle(note) {
     return {pitch:pitch, octave:octave, text:text};
 }
 
-display.addEventListener("keydown", function(e) {
+display.addEventListener("keydown", (e) => {
     if (["Space","ArrowUp","ArrowDown"].includes(e.key)) {e.preventDefault();}
-}, false);
+});
 fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (file) {reader.readAsArrayBuffer(file);}
