@@ -145,6 +145,6 @@ reader.addEventListener("load", (e) => {
 });
 const touchstart = (e) => {keydown(e);}; const touchend = (e) => {keyup(e);};
 const buttonFuncs = [start,pause,resume,backwards,forwards,help];
-const documentFuncs = [keydown,keyup,touchstart,touchend];
+const docEventTypes = ["keydown","keyup","touchstart","touchend"];
 for (f of buttonFuncs) {byId(f.name).addEventListener("click", f);} 
-for (f of documentFuncs) {document.addEventListener(f.name, key);}
+for (et of docEventTypes) {document.addEventListener(et, key);}
