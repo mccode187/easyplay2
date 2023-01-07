@@ -76,7 +76,7 @@ function format(x) {return x.trim().toLowerCase();}
 
 function forwards() {move(1,+byId("distance").value);}
 
-function help() {window.open("https://mcchu.com/easyplayhelp/", "_blank");}
+function help() {window.open("help.html", "_blank");}
 
 function key(e) { 
     if (e.type.includes("key")) {press = e.key;} 
