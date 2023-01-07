@@ -16,7 +16,6 @@ let tuning;
 oscillator.connect(gainNode).connect(audioContext.destination); resetVars();
 
 function adjustDisplay() {
-    document.getElementById("simpleDisplay").value = notes[index];
     function goTo() {
         display.blur();
         display.selectionStart = display.selectionEnd = start + indents[index];
@@ -25,7 +24,13 @@ function adjustDisplay() {
         display.selectionEnd = start + indents[index] + 1;
     }
     const width = 128 + 4 + 1; let start = (index * 2) * width; goTo();
-    if (activePress !== null) {start += width; goTo();}
+    if (activePress !== null) {
+        document.getElementById("simpleDisplay").value = notes[index];
+        start += width; 
+        goTo();
+    } else {
+        document.getElementById("simpleDisplay").value = "";
+    }
 }
 
 function backwards() { move(-1,+byId("distance").value); }
@@ -69,9 +74,9 @@ function down(e) {
 
 function format(x) {return x.trim().toLowerCase();}
 
-function forwards() { move(1,+byId("distance").value); }
+function forwards() {move(1,+byId("distance").value);}
 
-function help() { location.href = "https://mcchu.com/easyplayhelp/"; }
+function help() {location.href = "https://mcchu.com/easyplayhelp/";}
 
 function key(e) { 
     if (e.type.includes("key")) {press = e.key;} 
@@ -106,6 +111,7 @@ function resetVars() {
     else {normalGain = 0.15;}
     gainNode.gain.value = 0;
     display.value = emptyLine + "\n";
+    document.getElementById("simpleDisplay").value = "";
 }
 
 function resume() { paused = false; }
