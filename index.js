@@ -8,10 +8,11 @@ const oscillator = new OscillatorNode(audioContext, {frequency: 0});
 const reader = new FileReader();
 const select = byId("track");
 const value = {"c":0,"d":2,"e":4,"f":5,"g":7,"a":9,"b":11,"#":1,"&":-1};
+const width = 128 + 4 + 1;
 
 let activePress; let frequencies; let index; let indents; let midi; 
 let normalGain; let notes; let octave; let on = false; let paused; let press; 
-let tuning;
+let track; let tuning;
 
 oscillator.connect(gainNode).connect(audioContext.destination); resetVars();
 
@@ -23,7 +24,7 @@ function adjustDisplay() {
         display.selectionStart = start + indents[index];
         display.selectionEnd = start + indents[index] + 1;
     }
-    const width = 128 + 4 + 1; let start = (index * 2) * width; goTo();
+    let start = (index * 2) * width; goTo();
     if (activePress !== null) {
         document.getElementById("simpleDisplay").value = notes[index];
         start += width; 
@@ -72,6 +73,30 @@ function down(e) {
     }
 }
 
+function deleteNote(e) {
+/* places where we need to delete note / 
+   places where notes are stored:
+1) tonejs midi object (note objects)
+2) notes list (text e.g. "a&5")
+3) frequencies list (numbers e.g. "378.15")
+4) indents list (midi numbers)
+5) the display (a big block of text)
+*/
+
+if (byId("fileRadio").checked) {
+    midi.tracks[track].notes.splice(index, 1);
+}
+
+notes.splice(index, 1);
+frequencies.splice(index, 1);
+indents.splice(index,1);
+
+const start = (index * 2) * width
+let text = display.value.substring(0, start);
+text += display.value.substring(start + 2 * width);
+display.value = text;
+}
+
 function format(x) {return x.trim().toLowerCase();}
 
 function forwards() {move(1,+byId("distance").value);}
@@ -101,7 +126,7 @@ function resetVars() {
     tuning = unbundle(byId("tuningNote").value);
     tuning.frequency = +byId("tuningFrequency").value;
     if (byId("fileRadio").checked) {
-        const track = byId("track").selectedIndex;
+        track = select.selectedIndex;
         notes = midi.tracks[track].notes.map(x => format(x.name));
     } else {
         notes = format(byId("notes").value).split(/\s+/);
@@ -154,7 +179,7 @@ reader.addEventListener("load", (e) => {
     }
 });
 const touchstart = (e) => {keydown(e);}; const touchend = (e) => {keyup(e);};
-const buttonFuncs = [start,pause,resume,backwards,forwards,help];
+const buttonFuncs = [start,pause,resume,backwards,forwards,deleteNote,help];
 const docEventTypes = ["keydown","keyup","touchstart","touchend"];
 for (f of buttonFuncs) {byId(f.name).addEventListener("click", f);} 
 for (et of docEventTypes) {document.addEventListener(et, key);}
