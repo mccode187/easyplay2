@@ -40,7 +40,7 @@ function byId(id) { return document.getElementById(id); };
 function convertNotesToFrequencies() {
     octave = 4;
     for (let i = 0; i < notes.length; i++) {
-        const note = unbundle(notes[i]);
+        const note = unbundle(notes[i]); notes[i] = note.text;
         frequencies.push(tuning.frequency * 2**((note.pitch - tuning.pitch)/12 
                             + note.octave - tuning.octave));
         const indent = note.pitch + (note.octave + 1) * 12;
